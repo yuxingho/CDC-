@@ -1,0 +1,45 @@
+`timescale 1 ns/ 1 ns
+`define CLK_FAST_PERIOD 35
+`define CLK_SLOW_PERIOD 100
+
+module slow2fast_vlg_tst();
+// test vector input registers
+reg i_clk_f;
+reg i_clk_s;
+reg i_pluse_s;
+// wires                                               
+wire o_pluse_f;
+
+// assign statements (if any)                          
+slow2fast i1 (
+// port map - connection between master ports and signals/registers   
+	.i_clk_f(i_clk_f),
+	.i_clk_s(i_clk_s),
+	.i_pluse_s(i_pluse_s),
+	.o_pluse_f(o_pluse_f)
+);
+initial                                                
+begin                                                  
+	i_clk_f = 0;
+	forever
+		#(`CLK_FAST_PERIOD/2) i_clk_f = ~i_clk_f;
+end   
+                                                 
+initial                                                
+begin                                                  
+	i_clk_s = 0;
+	forever
+		#(`CLK_SLOW_PERIOD/2) i_clk_s = ~i_clk_s;
+end 
+
+initial                                                
+begin                                                  
+	i_pluse_s = 0;
+	repeat(10) @(posedge i_clk_s);
+	i_pluse_s = 1;
+	@(posedge i_clk_s);
+	i_pluse_s = 0;
+	repeat(10) @(posedge i_clk_s);
+end                                                   
+endmodule
+
